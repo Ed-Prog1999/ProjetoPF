@@ -1,36 +1,36 @@
 // usei como base de leitura, arquivo disponibilizado para aulas anteriores sobre olimpiadas de 2016
 const lerArquivoCsv = async (caminhoArquivo) => {
-  try {
-      const response = await fetch(`${caminhoArquivo}`);
-      if (!response.ok) {
-          throw new Error('Falha ao carregar o arquivo');
-      }
-      const csvContent = await response.text();
-      return csvContent;
-  } catch (err) {
-      throw err;
-  }
+    try {
+        const response = await fetch(`${caminhoArquivo}`);
+        if (!response.ok) {
+            throw new Error('Falha ao carregar o arquivo');
+        }
+        const csvContent = await response.text();
+        return csvContent;
+    } catch (err) {
+        throw err;
+    }
 };
 //processamento de linhas para objetos
 const parseCSV = (csv) => {
-  //separação de campos por ',' fora de aspas , usando o split para a formatação em quebra de linha 
-  const lines = csv.split(/\r?\n/);
-  const [cabecalho, ...linhasDados] = lines;
+//separação de campos por ',' fora de aspas , usando o split para a formatação em quebra de linha 
+    const lines = csv.split(/\r?\n/);
+    const [cabecalho, ...linhasDados] = lines;
 
-  const camposCabecalho = cabecalho.split(',');
-  //copias de dados para uso do replaace
-  const copiaCampoCabecalho = [...camposCabecalho].map(item => item.replace(/"/g, ''));
+    const camposCabecalho = cabecalho.split(',');
+//copias de dados para uso do replaace
+    const copiaCampoCabecalho = [...camposCabecalho].map(item => item.replace(/"/g, ''));
 
-  const dados = linhasDados.map(linha => {
-    // split cm parametro para ignorar virgulas entre aspas
+    const dados = linhasDados.map(linha => {
+// split cm parametro para ignorar virgulas entre aspas
     const campos = linha.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
-    return campos.reduce((obj, campo, index) => {
-      obj[copiaCampoCabecalho[index]] = campo.replace(/"/g, '');
-      return obj;
+    return campos.reduce((obj, Name, index) => {
+        obj[copiaCampoCabecalho[index]] = Name.replace(/"/g, '');
+        return obj;
     }, {});
-  });
+    });
 
-  return dados;
+    return dados;
 }
 
 // Exemplo de uso com async/await
@@ -43,24 +43,49 @@ const caminhoArquivoAtletas = 'atletas.csv';
     const resultado = Object.freeze(parseCSV(conteudoArquivo))
 
     //console.log('Dados lidos:', resultado);
+
+    //funçõa currificada para contar ocorrencias de determinado campo e agrupar em objetos , vai facilitar e possibilitar a contagem de objetos
+    // visto o arquivo trazer para alguns atletas mais de um objeto , seja pelas suas participações em mais de uma olimpiada ou competição em mais de um esporte
+    const criaObjetoComValoresDeCampoOcorrencia = (lista) => (campoDesejado)=>{
+        const resultado = [...lista].reduce((contador, controle) => {
+            const campo = controle[campoDesejado];
+            if (campo && campo.trim() !== '') {
+                const nomeSemAspas = campo.replace(/^"|"$/g, '');
+                contador[nomeSemAspas] = (contador[nomeSemAspas] || 0) + 1;
+            }
+            return contador;
+        }, {});
+        return resultado;
+    };
+    
+    //essa outra função trabalha em conjunto com a função acima, ela pega o unico ojeto gerado pela função acima e os formata
+    //em uma lista de objetos , onde cada objeto é o valor de um campo e quantas ocorrencias cada um teve
+    const criaListaObjetos = (lista) => (campo) => {
+      return Object.entries(lista).map(([chave, ocorrencias]) => ({
+        [campo]: chave,
+        ocorrencias
+      }));
+    };
+  
     
     // Questão 1 , acerca de idades , o usuários escolhe entre o mais novo ou mais velho participante ou participantes registrados
     // constantes para definir maior ou menor idade 
- 
-      const ordenaListaPorCampo =  (idadeMaisMenos) => (lista = resultado) => {
+    const OrdenaListaPorIdade =  (idadeMaisMenos) => (lista = resultado) => {
         const resolverNA = lista.filter( x => x.Age !== 'NA')
         const compararIdades = (a, b) => {
-          if (idadeMaisMenos === 'maior') {
-              return b.Age - a.Age; // Ordenar por maior idade
-          } else if ( idadeMaisMenos === 'menor') {
-            return a.Age - b.Age; // Ordenar por menor idade
+            if (idadeMaisMenos === 'maior') {                  
+              // Ordenar por maior idade
+                return b.Age - a.Age; 
+            } else if ( idadeMaisMenos === 'menor') {
+              // Ordenar por menor idade
+                 return a.Age - b.Age; 
           }
-        };
+      };      
       // uso do sort em uma copia da lista para garantir a imutabilidade da lista original
       const copiaLista = [...resolverNA];
-      const ordenaListaIdades = copiaLista.sort(compararIdades).map(x => `${x.Name},com inacreditaveis ${x.Age} anos, <br>
-         atleta do pais( time ): ${x.Team}, competiu na temporada ${x.Season} de ${x.Year} , quando tinha tal idade, pelo esport de ${x.Sport}.`);
-      return ordenaListaIdades[0] // retorna 58 , 0 maior em ordem e 12 , o menor 
+      const ordenaListaIdades = copiaLista.sort(compararIdades).map(x => `${x.Name} , com inacreditaveis ${x.Age} anos , <br>
+         atleta do pais( time ): ${x.Team} , competiu na temporada ${x.Season} de ${x.Year} , quando tinha tal idade, pelo esport de ${x.Sport}.`);
+      return ordenaListaIdades[0] 
     }
    // Obtém os elementos HTML
   const btMaisNovo = document.getElementById('btnMaisNovo');
@@ -70,30 +95,21 @@ const caminhoArquivoAtletas = 'atletas.csv';
   // Adiciona event listeners aos botões , menor idade
   btMaisNovo.addEventListener('click', () => {
   // Exibe o resultado da função idades com a menor idade no elemento <label>
-      resultadoLabel.innerHTML = ordenaListaPorCampo('menor')();
+      resultadoLabel.innerHTML = OrdenaListaPorIdade('menor')();
   });
   btMaisVelho.addEventListener('click', () => {
   // Exibe o resultado da função idades com a maior idade no elemento <label>
-      resultadoLabel.innerHTML = ordenaListaPorCampo('maior')();
+      resultadoLabel.innerHTML = OrdenaListaPorIdade('maior')();
   });
 
   //Questão2 - sobre edições de  olimpiadas
-  // cria uma lista de registro com campo e ocorrencias de determinado campo
-  const contarOcorrenciasPorId = [...resultado].reduce((contador, controle) => {
-    const { Year } = controle;
-    if (!isNaN(parseInt( Year ))) {
-      contador[ Year ] = (contador[ Year ] || 0) + 1;
-    }
-    return contador;
-  }, {});
+  //Reuso da função criaObjetoComValoresDeCampoOcorrencia com um dos parametros sendo o ano, para conseguir contar o numero de edições 
+  // e ver quando ocorreu a primeira olimpiada
   
-  const listaOcorrencias = Object.entries(contarOcorrenciasPorId).map(([ Year, ocorrencias]) => ({
-    Year: parseInt(Year),
-    ocorrencias
-  }));
   
-  const primeiraEdicaOlimpModerna = listaOcorrencias[0].Year
-  const ultimaEdicaoCatalogada = listaOcorrencias[listaOcorrencias.length - 1].Year
+  const primeiraEdicaOlimpModerna = criaListaObjetos(criaObjetoComValoresDeCampoOcorrencia(resultado)('Year'))('Year')
+  const ultimaEdicaoOlimpicaCatalogada = primeiraEdicaOlimpModerna[ primeiraEdicaOlimpModerna.length - 1].Year
+
   // adição de eventos ao html
   //botão1 - primeiro ano de olimpiadas modernas
   const btprimeiraEdicao = document.getElementById('primeiraEdicao');
@@ -103,14 +119,13 @@ const caminhoArquivoAtletas = 'atletas.csv';
   // Adiciona event listeners aos botões
   btprimeiraEdicao.addEventListener('click', () => {
   // const com resultados 
-      resultadoLabelQ2.innerHTML = `A primeira edição das novas olímpiadas ocorreu no ano de: ${primeiraEdicaOlimpModerna}`
+      resultadoLabelQ2.innerHTML = `A primeira edição das novas olímpiadas ocorreu no ano de: ${primeiraEdicaOlimpModerna[0].Year}`
   });
   
-  //console.log(primeiraEdicaOlimpModerna)
 
   //botão2 - numero de ediçoes desde a primeira , até 2016
   //função usandoo o reduce para contar ,por ano, a qntdd de edições  
-  const numeroEdicoes = listaOcorrencias.map( x => x.Year).reduce((acc) => acc + 1, 0)
+  const numeroEdicoes = primeiraEdicaOlimpModerna.reduce((acc) => acc + 1, 0)
 
   btnumeroEdicoes.addEventListener('click', () => {
         resultadoLabelQ2.innerHTML = `Desde a ocorrência da primeira olimpiada moderna , 
@@ -120,38 +135,15 @@ const caminhoArquivoAtletas = 'atletas.csv';
 
 
   // Q3 - homens e mulheres nas olimpiadas
-  //adaptação da função ordenalistaporcampo para separar em objetos nome dos atletas e a qunatidade de vezes q foi citado  no arquivo
-  const contarOcorrenciasPorNome = (lista) => { 
-    const resultado = [...lista].reduce((contador, controle) => {
-    const { Name } = controle;
-    // Verifica se o nome é uma string não vazia ou não é "NA", adicionei essa verificação pq em idades percebi q algns campos não tinham dados
-    //o trim, usado em uma cópia dos dados para remover espaços em branco e facilitar a leitura e tratamento dos dados
-    if (Name && Name.trim() !== '') {
-        // Remove as aspas duplas do início e do fim do nome
-        const nomeSemAspas = Name.replace(/^"|"$/g, '');
-        // Usa o nome (sem aspas) como chave do contador
-        contador[nomeSemAspas] = (contador[nomeSemAspas] || 0) + 1;
-    }
-    return contador;
-  }, {})
-    return resultado };
-  // Mapeia as ocorrências para um formato mais adequado
-  //nova constante para armazenar a lista filtrada por sexo
+  // reuso da função criaObjetoComValoresDeCampoOcorrencia agr usando como parametro atletas
+  //novas constante para armazenar a lista filtrada por sexo
   const sexMasculino = resultado.filter(x => x.Sex == 'M')
   const sexFeminino = resultado.filter(x => x.Sex == 'F')
-
-  //metodo para transformar o objeto recebido de contarocorrenciaspor nome para uma lista de objetos , onde cada objeto é um atleta q ja participou de algma olimpiada
-  const listaOcorrenciasNomes = (lista) => ( funcao) => {
-    return Object.entries(funcao(lista)).map(([Name, ocorrencias]) => ({
-    Name,
-    ocorrencias
-  }))}
-
   //utilização de const para guardar valor de aplicação a função currificada cm lista ja filtrada por sexo
   //resultados para botões do html
-  const totalHomens = (listaOcorrenciasNomes(sexMasculino)(contarOcorrenciasPorNome)).length
-  const totalMulheres = (listaOcorrenciasNomes(sexFeminino)(contarOcorrenciasPorNome)).length
-  const totalAtletas = (listaOcorrenciasNomes(resultado)(contarOcorrenciasPorNome)).length
+  const totalHomens = criaListaObjetos(criaObjetoComValoresDeCampoOcorrencia(sexMasculino)('Name'))('Name').length
+  const totalMulheres = criaListaObjetos( criaObjetoComValoresDeCampoOcorrencia(sexFeminino)('Name'))('Name').length
+  const totalAtletas = criaListaObjetos( criaObjetoComValoresDeCampoOcorrencia(resultado)('Name'))('Name').length
   
   const porcentagemReferenteaOutroValor = ( valor1 ) => ( valor2 ) => (valor1 / valor2) * 100
 
@@ -176,9 +168,54 @@ const caminhoArquivoAtletas = 'atletas.csv';
   });
   btTotal.addEventListener('click', () => {
   // Exibe o resultado da função idades com a maior idade no elemento <label>
-      resultadoQ3Label.innerHTML = `Em ${ultimaEdicaoCatalogada - primeiraEdicaOlimpModerna} anos de história moderna e jogos olimpicos ,
+      resultadoQ3Label.innerHTML = `Em ${ ultimaEdicaoOlimpicaCatalogada - primeiraEdicaOlimpModerna[0].Year } anos de história moderna e jogos olimpicos ,
         um total de ${totalAtletas} atletas ja competiram no evento.`
   });
+
+  //questão4 - sobre temporadas
+  //const armazenando o numero de sports e quantidade de vezes q  foi citado
+    
+    //constantes armazenando as temporadas de inverno  e verão separadamente
+    const filtraTemporada = ( lista ) => ( temporada ) => lista.filter( x => x.Season == temporada)
+    const verao = filtraTemporada(resultado)('Summer')
+    const inverno = filtraTemporada(resultado)('Winter')
+
+    // temporada verao
+    const ano1TemporadaVerao = criaListaObjetos( criaObjetoComValoresDeCampoOcorrencia (verao)('Year') )('Year')
+    const numeroDeAtletasQParticiparamVerao = criaListaObjetos ( criaObjetoComValoresDeCampoOcorrencia(resultado.filter(x => x.Year == ano1TemporadaVerao[0].Year))('Name') )('Name').length
+    const quantidadeSports = criaListaObjetos( criaObjetoComValoresDeCampoOcorrencia(verao)('Sport'))('Sport').length
+    const quantidadeModalidades = criaListaObjetos( criaObjetoComValoresDeCampoOcorrencia(verao)('Event'))('Event').length
+
+    
+    //temporada inverno
+    const ano1TemporadaInverno = criaListaObjetos( criaObjetoComValoresDeCampoOcorrencia(inverno)('Year') )('Year')
+    const numeroDeAtletasQParticiparamInverno = criaListaObjetos( criaObjetoComValoresDeCampoOcorrencia(resultado.filter( x => x.Year == ano1TemporadaInverno[0].Year))('Name') )('Name').length
+    const quantidadeSportsInverno = criaListaObjetos( criaObjetoComValoresDeCampoOcorrencia(inverno)('Sport') )('Sport').length
+    const quantidadeModalidasInverno = criaListaObjetos( criaObjetoComValoresDeCampoOcorrencia(inverno)('Event'))('Event').length
+
+    //botoes
+    const btVerao = document.getElementById('verao')
+    const btInverno = document.getElementById('inverno')
+    const resultadoQ4Label = document.getElementById('resultadoQ4')
+
+    //acionamente e exibição de botões/resultados
+    //bt verão
+    //const contendo registro cm dados da primeria olimpiada
+    const dadosPrimeiraOlimpiada = resultado.filter( x => x.Year == primeiraEdicaOlimpModerna[0].Year )
+    const dadosPrimeiraOlimpiadaInverno = resultado.filter( x => x.Season == 'Winter'  &&  x.Year == ano1TemporadaInverno[0].Year)
+
+    btVerao.addEventListener('click', () => {
+        resultadoQ4Label.innerHTML = `Inicialmente os jogos olímpicos eram apenas em sua temporada de verão , <br>
+          foi em ${dadosPrimeiraOlimpiada[0].Year}, na cidade de ${dadosPrimeiraOlimpiada[0].City}, no país da ${dadosPrimeiraOlimpiada[0].Team},
+          com um  total de ${numeroDeAtletasQParticiparamVerao} atletas , competindo em ${quantidadeSports} esportes e ${quantidadeModalidades} modalidades.`
+    })
+
+    //bt inverno
+    btInverno.addEventListener('click', () =>{
+        resultadoQ4Label.innerHTML = `A primeira competição de carater mundial , ocorreu em ${ano1TemporadaInverno[0].Year}, sediada em ${dadosPrimeiraOlimpiadaInverno[0].City} ,
+          ${dadosPrimeiraOlimpiadaInverno[6].Team}, com ${numeroDeAtletasQParticiparamInverno} competidores , disputando entre ${quantidadeSportsInverno} esportes 
+          e ${quantidadeModalidasInverno} modalidades.`
+    })
 
   } catch (err) {
     console.error('Erro ao ler o arquivo:', err);
