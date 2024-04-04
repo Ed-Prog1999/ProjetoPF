@@ -16,11 +16,9 @@ const parseCSV = (csv) => {
 //separação de campos por ',' fora de aspas , usando o split para a formatação em quebra de linha 
     const lines = csv.split(/\r?\n/);
     const [cabecalho, ...linhasDados] = lines;
-
     const camposCabecalho = cabecalho.split(',');
 //copias de dados para uso do replaace
     const copiaCampoCabecalho = [...camposCabecalho].map(item => item.replace(/"/g, ''));
-
     const dados = linhasDados.map(linha => {
 // split cm parametro para ignorar virgulas entre aspas
     const campos = linha.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
@@ -29,13 +27,10 @@ const parseCSV = (csv) => {
         return obj;
     }, {});
     });
-
     return dados;
 }
-
 // Exemplo de uso com async/await
 const caminhoArquivoAtletas = 'atletas.csv';
-
 (async () => {
   try {
     const conteudoArquivo = await lerArquivoCsv(caminhoArquivoAtletas);
@@ -43,7 +38,6 @@ const caminhoArquivoAtletas = 'atletas.csv';
     const resultado = Object.freeze(parseCSV(conteudoArquivo))
     const copiaDadosResultado = [...resultado]
     //console.log('Dados lidos:', resultado);
-
     //funçõa currificada para contar ocorrencias de determinado campo e agrupar em objetos , vai facilitar e possibilitar a contagem de objetos
     // visto o arquivo trazer para alguns atletas mais de um objeto , seja pelas suas participações em mais de uma olimpiada ou competição em mais de um esporte
     const criaObjetoComValoresDeCampoOcorrencia = (lista) => (campoDesejado)=>{
@@ -56,8 +50,7 @@ const caminhoArquivoAtletas = 'atletas.csv';
             return contador;
         }, {});
         return resultado;
-    };
-    
+    }; 
     //essa outra função trabalha em conjunto com a função acima, ela pega o unico objeto gerado pela função acima e os formata
     //em uma lista de objetos , onde cada objeto é o valor de um campo e quantas ocorrencias cada um teve
     const criaListaObjetos = (lista) => (campo) => {
@@ -89,8 +82,7 @@ const caminhoArquivoAtletas = 'atletas.csv';
    // Obtém os elementos HTML
   const btMaisNovo = document.getElementById('btnMaisNovo');
   const btMaisVelho = document.getElementById('btnMaisVelho');
-  const resultadoLabel = document.getElementById('resultadoQ1');
-    
+  const resultadoLabel = document.getElementById('resultadoQ1'); 
   // Adiciona event listeners aos botões , menor idade
   btMaisNovo.addEventListener('click', () => {
   // Exibe o resultado da função idades com a menor idade no elemento <label>
@@ -101,8 +93,9 @@ const caminhoArquivoAtletas = 'atletas.csv';
       resultadoLabel.innerHTML = OrdenaListaPorIdade('maior')();
   });
 
+
   // Q2 - Atletas homens e Atles mulheres
-  // reuso da função criaObjetoComValoresDeCampoOcorrencia agr usando como parametro atletas
+  // reuso da função criaObjetoComValoresDeCampoOcorrencia , agr , usando como arguento atletas
   //novas constante para armazenar a lista filtrada por sexo
   const sexMasculino = resultado.filter(x => x.Sex == 'M')
   const sexFeminino = resultado.filter(x => x.Sex == 'F')
@@ -111,17 +104,13 @@ const caminhoArquivoAtletas = 'atletas.csv';
   const totalHomens = criaListaObjetos(criaObjetoComValoresDeCampoOcorrencia(sexMasculino)('Name'))('Name').length
   const totalMulheres = criaListaObjetos( criaObjetoComValoresDeCampoOcorrencia(sexFeminino)('Name'))('Name').length
   const totalAtletas = criaListaObjetos( criaObjetoComValoresDeCampoOcorrencia(resultado)('Name'))('Name').length
-  
   const porcentagemReferenteaOutroValor = ( valor1 ) => ( valor2 ) => (valor1 / valor2) * 100
-  // usando length - 2 como indice do ultimo elemento , devido o length - 1 retorna a ultima linha do arquivo , que está vazia
   const tempoDeEventoOlimpico = copiaDadosResultado.sort((a , b) => a.Year - b.Year)
-
   //botões questão 2
   const btHomens = document.getElementById('numeroHomens');
   const btMulheres = document.getElementById('numeroMulheres');
   const btTotal = document.getElementById('numeroTotal');
-  const resultadoQ2Label = document.getElementById('resultadoQ2')
-    
+  const resultadoQ2Label = document.getElementById('resultadoQ2')  
   // Adiciona event listeners aos botões
   btHomens.addEventListener('click', () => {
   // Exibe o resultado da função idades com a menor idade no elemento <label>
@@ -137,11 +126,39 @@ const caminhoArquivoAtletas = 'atletas.csv';
   });
   btTotal.addEventListener('click', () => {
   // Exibe o resultado da função idades com a maior idade no elemento <label>
+  // usando length - 2 como indice do ultimo elemento , devido o length - 1 retorna a ultima linha do arquivo , que está vazia
       resultadoQ2Label.innerHTML = `Em ${ tempoDeEventoOlimpico[tempoDeEventoOlimpico.length - 2 ].Year - tempoDeEventoOlimpico[0].Year } anos de história moderna de jogos olimpícos ,
         um total de ${totalAtletas} atletas ja competiram no evento.`
   });
 
 
+  // questão 3
+  // altura de atletas
+  //lista de alturas dos atles
+  const alturaAtletas = criaListaObjetos (criaObjetoComValoresDeCampoOcorrencia(resultado)('Height'))('Altura');
+  const atletaMaisBaixo = alturaAtletas[0].Altura
+  const atletaMaisAlto = alturaAtletas[alturaAtletas. length - 2].Altura
+  //informações dos atletas selecionados
+  const dadosAtletaMaisBaixo = resultado.filter( x => x.Height == atletaMaisBaixo)[0]
+  const dadosAtletaMaisAlto = resultado.filter( x => x.Height == atletaMaisAlto)
+  
+  //botões Q3
+  const btMaisBaixo = document.getElementById('atletaMaisBaixo')
+  const btMaisAlto = document.getElementById('atletaMaisAlto')
+  const labelResultadoQ3 = document.getElementById('resultadoQ3')
+
+  //eveento para os botões e exibição de dados em tela
+  btMaisBaixo.addEventListener( 'click',() =>{
+    labelResultadoQ3.innerHTML = `Uma das menores alturas registradas em olimpiadas pertence à atleta ${dadosAtletaMaisBaixo.Name} , <br>
+        do ${dadosAtletaMaisBaixo.Team} , com ${ dadosAtletaMaisBaixo.Height / 100} m de altura, competidora de ${dadosAtletaMaisBaixo.Sport},
+        competiu nos jogos de ${dadosAtletaMaisBaixo.Year} , temporada '${dadosAtletaMaisBaixo.Season}'.`
+  })
+
+  btMaisAlto.addEventListener( 'click',() =>{
+    labelResultadoQ3.innerHTML = `O atleta olimpíco mais alto foi o gigante da ${dadosAtletaMaisAlto[0].Team} , ${dadosAtletaMaisAlto[0].Name} , 
+      com supreendentes ${dadosAtletaMaisAlto[0].Height / 100} m de altura , como era de se esperar, jogador de ${dadosAtletaMaisAlto[0].Sport}.<br>
+      participou dos jogos de ${dadosAtletaMaisAlto[0].Year}, ${dadosAtletaMaisAlto[1].Year} e ${dadosAtletaMaisAlto[2].Year} , temporada '${dadosAtletaMaisAlto[0].Season}'.`
+  })
 
   } catch (err) {
     console.error('Erro ao ler o arquivo:', err);
