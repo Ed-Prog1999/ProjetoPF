@@ -82,15 +82,15 @@ const caminhoArquivoAtletas = 'atletas.csv';
    // Obtém os elementos HTML
   const btMaisNovo = document.getElementById('btnMaisNovo');
   const btMaisVelho = document.getElementById('btnMaisVelho');
-  const resultadoLabel = document.getElementById('resultadoQ1'); 
+  const labelResultadoQ1 = document.getElementById('resultadoQ1'); 
   // Adiciona event listeners aos botões , menor idade
   btMaisNovo.addEventListener('click', () => {
   // Exibe o resultado da função idades com a menor idade no elemento <label>
-      resultadoLabel.innerHTML = OrdenaListaPorIdade('menor')();
+      labelResultadoQ1.innerHTML = OrdenaListaPorIdade('menor')();
   });
   btMaisVelho.addEventListener('click', () => {
   // Exibe o resultado da função idades com a maior idade no elemento <label>
-      resultadoLabel.innerHTML = OrdenaListaPorIdade('maior')();
+      labelResultadoQ1.innerHTML = OrdenaListaPorIdade('maior')();
   });
 
 
@@ -110,16 +110,16 @@ const caminhoArquivoAtletas = 'atletas.csv';
   const btHomens = document.getElementById('numeroHomens');
   const btMulheres = document.getElementById('numeroMulheres');
   const btTotal = document.getElementById('numeroTotal');
-  const resultadoQ2Label = document.getElementById('resultadoQ2')  
+  const labelResultadoQ2 = document.getElementById('resultadoQ2')  
   // Adiciona event listeners aos botões
   btHomens.addEventListener('click', () => {
   // Exibe o resultado da função idades com a menor idade no elemento <label>
-      resultadoQ2Label.innerHTML = `Desde a primeira edição das olimpiadas modernas, 
+      labelResultadoQ2.innerHTML = `Desde a primeira edição das olimpiadas modernas, 
         dentre todas até a ultima catalogada( 2016) um total de ${totalHomens} atletas homens participaram de olimpiadas.`
   });
   btMulheres.addEventListener('click', () => {
   // Exibe o resultado da função idades com a maior idade no elemento <label>
-    resultadoQ2Label.innerHTML = `As mulheres na história das olimpíadas , tambem tiveram  seu papel , 
+    labelResultadoQ2.innerHTML = `As mulheres na história das olimpíadas , tambem tiveram  seu papel , 
       foram ${totalMulheres} que ja participaram  desde sua primeira edição, 
       um numero expressivo ,<br> ainda assim , distante do total de homens , 
       elas representam apenas ${(porcentagemReferenteaOutroValor(totalMulheres)(totalHomens)).toFixed(2)}% do total de atletas que ja participaram em edições.`
@@ -127,7 +127,7 @@ const caminhoArquivoAtletas = 'atletas.csv';
   btTotal.addEventListener('click', () => {
   // Exibe o resultado da função idades com a maior idade no elemento <label>
   // usando length - 2 como indice do ultimo elemento , devido o length - 1 retorna a ultima linha do arquivo , que está vazia
-      resultadoQ2Label.innerHTML = `Em ${ tempoDeEventoOlimpico[tempoDeEventoOlimpico.length - 2 ].Year - tempoDeEventoOlimpico[0].Year } anos de história moderna de jogos olimpícos ,
+      labelResultadoQ2.innerHTML = `Em ${ tempoDeEventoOlimpico[tempoDeEventoOlimpico.length - 2 ].Year - tempoDeEventoOlimpico[0].Year } anos de história moderna de jogos olimpícos ,
         um total de ${totalAtletas} atletas ja competiram no evento.`
   });
 
@@ -157,8 +157,64 @@ const caminhoArquivoAtletas = 'atletas.csv';
   btMaisAlto.addEventListener( 'click',() =>{
     labelResultadoQ3.innerHTML = `O atleta olimpíco mais alto foi o gigante da ${dadosAtletaMaisAlto[0].Team} , ${dadosAtletaMaisAlto[0].Name} , 
       com supreendentes ${dadosAtletaMaisAlto[0].Height / 100} m de altura , como era de se esperar, jogador de ${dadosAtletaMaisAlto[0].Sport}.<br>
-      participou dos jogos de ${dadosAtletaMaisAlto[0].Year}, ${dadosAtletaMaisAlto[1].Year} e ${dadosAtletaMaisAlto[2].Year} , temporada '${dadosAtletaMaisAlto[0].Season}'.`
+      participou dos jogos de ${dadosAtletaMaisAlto[0].Year}, ${dadosAtletaMaisAlto[1].Year} e ${dadosAtletaMaisAlto[2].Year} , temporada '${dadosAtletaMaisAlto[0].Season}' .`
   })
+
+  //função para juntar registros de um msm atletas e remover registros , com determinado campo passado repetido
+  //criada para descobrir qual atleta participou de mais olimpiadas ou modalidades de esportes , usada fututramente na questão 5 
+  function JuntaRegistrosAtleta(registros, campo) {
+    const atletas = registros.reduce((acc, registro) => {
+        if (!acc[registro.Name]) {
+            acc[registro.Name] = {};
+        }
+        acc[registro.Name][registro[campo]] = true;
+        return acc;
+    }, {});
+
+    return Object.keys(atletas).map(nome => ({
+        Name: nome,
+        Participacoes: Object.keys(atletas[nome])
+    }));
+  }
+
+  //questão 4
+  // atletas Notaveis , mais citados em arquivo, inverno e verão
+  // filtro de atletas por temporada
+  const atletaVerao = resultado.filter( x => x.Season == 'Summer' )
+  const atletaInverno = resultado.filter( x => x.Season == 'Winter')
+  // reuso  de chamada para criaçao de lista e objetos com o numero de ocorrencia de cada nome de atleta
+  //atleta verão 
+  const atletaNotavelVerao = criaListaObjetos( criaObjetoComValoresDeCampoOcorrencia (atletaVerao)('Name'))('Name')
+  const atletaNotavelVeraoOrd = [...atletaNotavelVerao].sort((a, b) => b.ocorrencias - a.ocorrencias)[0]
+  const dadosAtletaMaisCitado = resultado.filter( x => x.Name == atletaNotavelVeraoOrd.Name)
+  const encontrarParticipacoesAtleta = JuntaRegistrosAtleta(dadosAtletaMaisCitado , 'Event')[0]
+  //const modalidadeAtletaMaisCitado = encontrarParticipacoesAtleta.Participacoes.join(' , ')
+  const participacoesAtletaVerao =JuntaRegistrosAtleta(resultado.filter( x => x.ID == 77710), "Year")[0].Participacoes.join( '  ,  ')
+  //atleta inverno
+  const atletaNotavelInverno =  criaListaObjetos( criaObjetoComValoresDeCampoOcorrencia (atletaInverno)('Name'))('Name')
+  const atletaNotavelInvernoOrd = [...atletaNotavelInverno].sort((a, b) => b.ocorrencias - a.ocorrencias)[0]
+  const dadosAtletaMaisCitadoInverno = resultado.filter( x => x.Name == atletaNotavelInvernoOrd.Name )
+  const encontrarParticipacoesAtletaInverno = JuntaRegistrosAtleta(dadosAtletaMaisCitadoInverno , 'Event')[0]
+  const modalidadeAtletaMaisCitadoInverno = encontrarParticipacoesAtletaInverno.Participacoes.join(' , ')
+
+  
+  //botões Q4
+  const btAtletaNotavelVerao = document.getElementById('maisCitadoVerao')
+  const btAtletaNotavelInverno = document.getElementById('maisCitadoInverno')
+  const labelResultadoQ4 = document.getElementById('resultadoQ4')
+
+  btAtletaNotavelVerao.addEventListener('click', () => {
+      labelResultadoQ4.innerHTML = `O atleta de ${dadosAtletaMaisCitado[0].Team} , ${dadosAtletaMaisCitado[0].Name} 
+        um dos que mais competiu em modalidades diferentes de um esporte de verão , competiu nos jogos de ${participacoesAtletaVerao}  <br>,
+        competidor de ${dadosAtletaMaisCitado[0].Sport} , disputou diversas modalidades do esporte ,que hoje já não fazem parte dos jogos.`
+  })
+
+  btAtletaNotavelInverno.addEventListener('click', () => {
+      labelResultadoQ4.innerHTML = `Um dos competidores com mais participações em olimpíadas ,  ${dadosAtletaMaisCitadoInverno[0].Name},
+        competiu pelo esporte de ${dadosAtletaMaisCitadoInverno[0].Sport} , <br> nos anos de ${dadosAtletaMaisCitadoInverno[0].Year} à
+        ${dadosAtletaMaisCitadoInverno[dadosAtletaMaisCitadoInverno.length - 1].Year}, nas modalidades de <br>${modalidadeAtletaMaisCitadoInverno} .`
+  })
+  
 
   } catch (err) {
     console.error('Erro ao ler o arquivo:', err);
