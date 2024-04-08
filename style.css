@@ -1,0 +1,164 @@
+#p1 {
+    color: white;
+    font-size: 40px;
+    font-weight: 900;
+    font-style: oblique;
+}
+
+#p2 span {
+    color: white;
+    text-decoration: double;
+    font-size: x-large;
+    font-weight: 600;
+}
+
+body {
+    background-image: url("background.jpg");
+    background-size: cover;
+    background-position: top;
+    background-repeat: no-repeat;
+}
+footer {
+    text-align: center;
+    font-family: Arial, Helvetica, sans-serif;
+}
+#pq5,
+#pq4,
+#pq3,
+#pq2,
+#pq1 {
+    font-style: italic;
+    font-family: "Times New Roman", Times, serif;
+    font-size: 30px;
+    font-weight: bolder;
+}
+#Q1 {
+    color: black;
+    font-size: x-large;
+}
+#Q2 {
+    position: absolute;
+    top: 50%;
+    right: 0;
+    transform: translate(0, -50%);
+    background-color: rgba(255, 255, 255, 0);
+    padding: 20px;
+}
+
+#Q3 {
+    position: absolute;
+    top: 80%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: rgba(255, 255, 255, 0);
+    padding: 20px;
+}
+
+#btnMaisNovo,
+#btnMaisVelho,
+#numeroHomens,
+#numeroMulheres,
+#numeroTotal,
+#atletaMaisAlto,
+#atletaMaisBaixo,
+#maisCitadoVerao,
+#maisCitadoInverno,
+#maisParticipacoes,
+#maisMedalhas {
+    border-bottom: rgb(49, 195, 136);
+    border-radius: 40px;
+    width: 120px;
+    height: 40px;
+    font-size: 14px;
+    background-color: rgba(6, 184, 148, 0.5);
+}
+
+#resultadoQ1 {
+    display: inline-block;
+    padding: 5px 8px;
+    border: 3px solid black;
+    background-color: red;
+    font-size: large;
+    border-radius: 10px;
+    color: white;
+    width: 500px;
+    word-wrap: break-word;
+}
+#Q2 {
+    text-align: right;
+    font-size: x-large;
+}
+#resultadoQ2 {
+    display: inline-block;
+    padding: 5px 8px;
+    border: 3px solid black;
+    background-color: rgb(12, 204, 12);
+    font-size: large;
+    border-radius: 10px;
+    color: white;
+    width: 500px;
+    word-wrap: break-word;
+}
+
+#Q3,
+#Q5 {
+    font-size: x-large;
+}
+#resultadoQ3 {
+    display: inline-block;
+    padding: 5px 8px;
+    border: 3px solid black;
+    background-color: rgb(250, 254, 9);
+    font-size: large;
+    border-radius: 10px;
+    color: black;
+    width: 500px;
+    word-wrap: break-word;
+}
+
+#resultadoQ4,
+#resultadoQ5 {
+    display: inline-block;
+    padding: 5px 8px;
+    border: 3px solid black;
+    background-color: rgb(17, 80, 122);
+    font-size: large;
+    border-radius: 10px;
+    color: white;
+    width: 400px;
+    word-wrap: break-word;
+}
+#Q4 {
+    font-size: x-large;
+    position: absolute; /* Permite posicionar a div de forma fixa na tela */
+    top: 90%; /* Aproxima o topo da div da metade da altura da tela */
+    right: 100px; /* Distância entre a esquerda da div e a esquerda da janela do navegador */
+    background-color: rgba(255, 255, 255, 0); /* Cor de fundo da div */
+    padding: 20px; /* Espaçamento interno da div */
+    transform: translate(
+        20%,
+        0
+    ); /* Move a div para a direita metade de sua própria largura */
+}
+
+#resultadoQ5 {
+    background-color: black;
+}
+#Q5 {
+    position: absolute;
+    top: 90%;
+    left: 20px;
+    width: 500px;
+    height: 100px;
+    background-color: rgba(173, 216, 230, 0);
+}
+footer {
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    background-color: rgba(255, 255, 255, 0);
+    color: white;
+    text-align: center;
+    padding: 20px;
+}
