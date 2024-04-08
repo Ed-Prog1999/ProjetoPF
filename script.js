@@ -1,4 +1,4 @@
-// usei como base de leitura, arquivo disponibilizado para aulas anteriores sobre olimpiadas de 2016
+// usei como base para leitura do arquivo , codigo disponibilizado para aulas anteriores sobre olimpiadas de 2016
 const lerArquivoCsv = async (caminhoArquivo) => {
     try {
         const response = await fetch(`${caminhoArquivo}`);
@@ -29,7 +29,6 @@ const parseCSV = (csv) => {
     });
     return dados;
 }
-// Exemplo de uso com async/await
 const caminhoArquivoAtletas = 'atletas.csv';
 (async () => {
   try {
@@ -37,9 +36,9 @@ const caminhoArquivoAtletas = 'atletas.csv';
     //Object.Freeze para congelar e garantir a imutabilidade dos dados obtidos através do arquivo fornecido
     const resultado = Object.freeze(parseCSV(conteudoArquivo))
     const copiaDadosResultado = [...resultado]
-    //console.log('Dados lidos:', resultado);
     //funçõa currificada para contar ocorrencias de determinado campo e agrupar em objetos , vai facilitar e possibilitar a contagem de objetos
-    // visto o arquivo trazer para alguns atletas mais de um objeto , seja pelas suas participações em mais de uma olimpiada ou competição em mais de um esporte
+    // visto o arquivo trazer para alguns atletas mais de um objeto , seja pelas suas participações em mais de uma olimpiada ou competição em mais de uma
+    //modalide de um esporte
     const criaObjetoComValoresDeCampoOcorrencia = (lista) => (campoDesejado)=>{
         const resultado = [...lista].reduce((contador, controle) => {
             const campo = controle[campoDesejado];
@@ -53,7 +52,7 @@ const caminhoArquivoAtletas = 'atletas.csv';
     }; 
     //essa outra função trabalha em conjunto com a função acima, ela pega o unico objeto gerado pela função acima e os formata
     //em uma lista de objetos , onde cada objeto é o valor de um campo e quantas ocorrencias cada um teve
-    const criaListaObjetos = (lista) => (campo) => {
+    const formataListaObjetos = (lista) => (campo) => {
       return Object.entries(lista).map(([chave, ocorrencias]) => ({
         [campo]: chave,
         ocorrencias
@@ -101,15 +100,15 @@ const caminhoArquivoAtletas = 'atletas.csv';
   const sexFeminino = resultado.filter(x => x.Sex == 'F')
   //utilização de const para guardar valor de aplicação a função currificada cm lista ja filtrada por sexo
   //resultados para botões do html
-  const totalHomens = criaListaObjetos(criaObjetoComValoresDeCampoOcorrencia(sexMasculino)('Name'))('Name').length
-  const totalMulheres = criaListaObjetos( criaObjetoComValoresDeCampoOcorrencia(sexFeminino)('Name'))('Name').length
-  const totalAtletas = criaListaObjetos( criaObjetoComValoresDeCampoOcorrencia(resultado)('Name'))('Name').length
+  const totalHomens = formataListaObjetos(criaObjetoComValoresDeCampoOcorrencia(sexMasculino)('Name'))('Name').length
+  const totalMulheres = formataListaObjetos( criaObjetoComValoresDeCampoOcorrencia(sexFeminino)('Name'))('Name').length
+  const totalAtletas = formataListaObjetos( criaObjetoComValoresDeCampoOcorrencia(resultado)('Name'))('Name').length
   const porcentagemReferenteaOutroValor = ( valor1 ) => ( valor2 ) => (valor1 / valor2) * 100
   const tempoDeEventoOlimpico = copiaDadosResultado.sort((a , b) => a.Year - b.Year)
   //botões questão 2
   const btHomens = document.getElementById('numeroHomens');
   const btMulheres = document.getElementById('numeroMulheres');
-  const btTotal = document.getElementById('numeroTotal');
+  const btTotal = document.getElementById('numeroTotal')
   const labelResultadoQ2 = document.getElementById('resultadoQ2')  
   // Adiciona event listeners aos botões
   btHomens.addEventListener('click', () => {
@@ -120,12 +119,11 @@ const caminhoArquivoAtletas = 'atletas.csv';
   btMulheres.addEventListener('click', () => {
   // Exibe o resultado da função idades com a maior idade no elemento <label>
     labelResultadoQ2.innerHTML = `As mulheres na história das olimpíadas , tambem tiveram  seu papel , 
-      foram ${totalMulheres} que ja participaram  desde sua primeira edição, 
-      um numero expressivo ,<br> ainda assim , distante do total de homens , 
+      foram ${totalMulheres} que ja participaram  desde sua primeira edição moderna, 
+      um numero expressivo ,<br> 
       elas representam apenas ${(porcentagemReferenteaOutroValor(totalMulheres)(totalHomens)).toFixed(2)}% do total de atletas que ja participaram em edições.`
   });
   btTotal.addEventListener('click', () => {
-  // Exibe o resultado da função idades com a maior idade no elemento <label>
   // usando length - 2 como indice do ultimo elemento , devido o length - 1 retorna a ultima linha do arquivo , que está vazia
       labelResultadoQ2.innerHTML = `Em ${ tempoDeEventoOlimpico[tempoDeEventoOlimpico.length - 2 ].Year - tempoDeEventoOlimpico[0].Year } anos de história moderna de jogos olimpícos ,
         um total de ${totalAtletas} atletas ja competiram no evento.`
@@ -134,8 +132,9 @@ const caminhoArquivoAtletas = 'atletas.csv';
 
   // questão 3
   // altura de atletas
-  //lista de alturas dos atles
-  const alturaAtletas = criaListaObjetos (criaObjetoComValoresDeCampoOcorrencia(resultado)('Height'))('Altura');
+  //lista de alturas dos atletass
+  //formatlalistaobjetos tras as alturas e numero de ocorrencias para cada , usei o mais alto e mais baixo
+  const alturaAtletas = formataListaObjetos (criaObjetoComValoresDeCampoOcorrencia(resultado)('Height'))('Altura');
   const atletaMaisBaixo = alturaAtletas[0].Altura
   const atletaMaisAlto = alturaAtletas[alturaAtletas. length - 2].Altura
   //informações dos atletas selecionados
@@ -160,9 +159,9 @@ const caminhoArquivoAtletas = 'atletas.csv';
       participou dos jogos de ${dadosAtletaMaisAlto[0].Year}, ${dadosAtletaMaisAlto[1].Year} e ${dadosAtletaMaisAlto[2].Year} , temporada '${dadosAtletaMaisAlto[0].Season}' .`
   })
 
-  //função para juntar registros de um msm atletas e remover registros , com determinado campo passado repetido
+  //função para juntar registros de um msm atletas e remover registros repetidos do msm, com determinado campo passado repetido
   //criada para descobrir qual atleta participou de mais olimpiadas ou modalidades de esportes , usada fututramente na questão 5 
-  function JuntaRegistrosAtleta(registros, campo) {
+  const JuntaRegistrosAtleta = (registros ) => ( campo) => {
     const atletas = registros.reduce((acc, registro) => {
         if (!acc[registro.Name]) {
             acc[registro.Name] = {};
@@ -184,17 +183,16 @@ const caminhoArquivoAtletas = 'atletas.csv';
   const atletaInverno = resultado.filter( x => x.Season == 'Winter')
   // reuso  de chamada para criaçao de lista e objetos com o numero de ocorrencia de cada nome de atleta
   //atleta verão 
-  const atletaNotavelVerao = criaListaObjetos( criaObjetoComValoresDeCampoOcorrencia (atletaVerao)('Name'))('Name')
+  const atletaNotavelVerao = formataListaObjetos( criaObjetoComValoresDeCampoOcorrencia (atletaVerao)('Name'))('Name')
   const atletaNotavelVeraoOrd = [...atletaNotavelVerao].sort((a, b) => b.ocorrencias - a.ocorrencias)[0]
   const dadosAtletaMaisCitado = resultado.filter( x => x.Name == atletaNotavelVeraoOrd.Name)
-  const encontrarParticipacoesAtleta = JuntaRegistrosAtleta(dadosAtletaMaisCitado , 'Event')[0]
-  //const modalidadeAtletaMaisCitado = encontrarParticipacoesAtleta.Participacoes.join(' , ')
-  const participacoesAtletaVerao =JuntaRegistrosAtleta(resultado.filter( x => x.ID == 77710), "Year")[0].Participacoes.join( '  ,  ')
+  // o uso do join une os elementos da lista para exibiçao em pagina
+  const participacoesAtletaVerao =JuntaRegistrosAtleta(dadosAtletaMaisCitado)("Year")[0].Participacoes.join('  ,  ')
   //atleta inverno
-  const atletaNotavelInverno =  criaListaObjetos( criaObjetoComValoresDeCampoOcorrencia (atletaInverno)('Name'))('Name')
+  const atletaNotavelInverno =  formataListaObjetos( criaObjetoComValoresDeCampoOcorrencia (atletaInverno)('Name'))('Name')
   const atletaNotavelInvernoOrd = [...atletaNotavelInverno].sort((a, b) => b.ocorrencias - a.ocorrencias)[0]
   const dadosAtletaMaisCitadoInverno = resultado.filter( x => x.Name == atletaNotavelInvernoOrd.Name )
-  const encontrarParticipacoesAtletaInverno = JuntaRegistrosAtleta(dadosAtletaMaisCitadoInverno , 'Event')[0]
+  const encontrarParticipacoesAtletaInverno = JuntaRegistrosAtleta(dadosAtletaMaisCitadoInverno )('Event')[0]
   const modalidadeAtletaMaisCitadoInverno = encontrarParticipacoesAtletaInverno.Participacoes.join(' , ')
 
   
@@ -214,7 +212,69 @@ const caminhoArquivoAtletas = 'atletas.csv';
         competiu pelo esporte de ${dadosAtletaMaisCitadoInverno[0].Sport} , <br> nos anos de ${dadosAtletaMaisCitadoInverno[0].Year} à
         ${dadosAtletaMaisCitadoInverno[dadosAtletaMaisCitadoInverno.length - 1].Year}, nas modalidades de <br>${modalidadeAtletaMaisCitadoInverno} .`
   })
-  
+
+  //questão 5 , atleta que mais participou de olimpiadas e o q participou em mais modalidades 
+  //Uso da função juntaRegistros atleta para separar em registros os atletas e os jogos que participou
+  //função baseada na função juntaRegistro, mas diferente dela , essa contabiliza as repetições do campo Medal, retornando o atleta e as melhadas q ganhou 
+  const JuntaRegistrosAtletasMedalhasGanhas = (lista) => {
+    const atletas = lista.reduce((acc, registro) => {
+        const { Name, Medal } = registro;
+        if (!acc[Name]) {
+            acc[Name] = { Medal: [] };
+        }
+        if (Medal !== 'NA') {
+            acc[Name] = {
+                ...acc[Name],
+                Medal: [...acc[Name].Medal, Medal]
+            };
+        }
+        return acc;
+    }, {});
+
+    return Object.keys(atletas).map(nome => ({
+        Name: nome,
+        Medal: atletas[nome].Medal
+    }));
+};
+  //atleta com mais participações
+  const atletaMaisParticipacoes = JuntaRegistrosAtleta( resultado )('Year')
+  const atletaMaisParticipacoesOrd = [...atletaMaisParticipacoes].sort((a,b) => b.Participacoes.length - a.Participacoes.length)[0]
+  const dadosAtletaMaisParticipacoes = resultado.filter( x => x.Name == atletaMaisParticipacoesOrd.Name)[0]
+  //atleta com mais medalhas
+  const atletaMaisMedalhas = JuntaRegistrosAtletasMedalhasGanhas(resultado)
+  const atletaMaisMedalhasOrd = [...atletaMaisMedalhas].sort((a, b) => b.Medal.length - a.Medal.length)[0]
+  const dadosMaiorMedalhista = resultado.filter(x => x.Name == atletaMaisMedalhasOrd.Name )
+  //função usando o reduce para contar algo de uma lista dado lista e valor
+  const contadorRedu = (lista) => ( campo ) => ( conteudoCampoAContar) =>{
+      const contagem = lista[campo].reduce(( acc , x) => x == conteudoCampoAContar ? acc + 1 : acc + 0 , 0)
+      return contagem
+  }
+  const medalhasOuro = contadorRedu(atletaMaisMedalhasOrd)('Medal')('Gold')
+  const medalhasPrata = contadorRedu(atletaMaisMedalhasOrd)('Medal')('Silver')
+  //botões Q5
+  //botão mais participação
+  const btMaisParticipacoes = document.getElementById('maisParticipacoes')
+  const btMaisMedalhas = document.getElementById('maisMedalhas')
+  const labelResultadoQ5 = document.getElementById('resultadoQ5')
+
+  //events botões
+  btMaisParticipacoes.addEventListener('click', () =>{
+    labelResultadoQ5.innerHTML = `${dadosAtletaMaisParticipacoes.Name} marcou a história dos jogos , quebrando recordes 
+      como o atleta que mais participou de olimpiadas , esportista de ${dadosAtletaMaisParticipacoes.Sport}( hipismo) ,<br> foram 
+      ${atletaMaisParticipacoesOrd.Participacoes[ atletaMaisParticipacoesOrd.Participacoes.length -1] - atletaMaisParticipacoesOrd.Participacoes[0]}
+      anos competindo em olimpíadas ,10 edições , competindo pela primeira vez em ${atletaMaisParticipacoesOrd.Participacoes[0]} ,<br>
+      seguidamente até os jogos de ${atletaMaisParticipacoesOrd.Participacoes[ atletaMaisParticipacoesOrd.Participacoes.length -1]}. Seu país , o ${dadosAtletaMaisParticipacoes.Team}
+      deve ter muito orgulho de seu atleta.`
+  })
+
+  btMaisMedalhas.addEventListener('click', () => {
+    labelResultadoQ5.innerHTML = `Um dos melhores , se não o melhor , atleta de sua geração , ${dadosMaiorMedalhista[0].Name},
+      é uma lenda viva do esporte,<br> ganhou um total de ${atletaMaisMedalhasOrd.Medal.length} medalhas , um número que se torna
+      ainda mais expressivo , pelo fato de ter ganhado ${medalhasOuro} medalhas de ouro , mais ${medalhasPrata} de prata, <br>
+      e ${atletaMaisMedalhasOrd.Medal.length - ( medalhasOuro + medalhasPrata)} de bronze. Dominou o esporte '${dadosMaiorMedalhista[0].Sport}'(natação)
+      de  ${dadosMaiorMedalhista[0].Year} até ${dadosMaiorMedalhista[dadosMaiorMedalhista.length - 1].Year}, 
+      garantindo sempre muitas medalhas para o seu pais '${dadosMaiorMedalhista[0].Team}'.`
+  })
 
   } catch (err) {
     console.error('Erro ao ler o arquivo:', err);
